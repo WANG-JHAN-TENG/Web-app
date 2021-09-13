@@ -30,7 +30,5 @@ export default {
 body{
   width: 375px;
   margin: 0 auto;
-  background: black;
-  color: rgb(243, 243, 243);
 }
 </style>
