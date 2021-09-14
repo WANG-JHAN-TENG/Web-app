@@ -1,64 +1,40 @@
 <template>
 <div id="posts">
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
-  <div class="post">
-    <a href="#">
+  <div class="post" @click="openPhoto">
       <img src="https://placeimg.com/121/115/animals" alt="post">
-    </a>
   </div>
 </div>
 <div id="footer">
@@ -85,6 +61,11 @@ export default {
   name: 'Posts',
   props: {
 
+  },
+  methods:{
+    openPhoto(){
+      this.$store.commit('openPhoto');
+    }
   }
 }
 </script>
@@ -100,10 +81,10 @@ export default {
   padding-bottom: 3px;
   width: 33.3333%;
   height: 118px;
+  cursor: pointer;
 }
 #posts a{
 display: inline-block;
-height: 0;
 }
 #footer{
   display: flex;

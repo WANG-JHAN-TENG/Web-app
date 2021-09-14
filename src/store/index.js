@@ -2,14 +2,21 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    showTagged:false,
+    showPosts:true,
+    checkImg:false,
   },
   mutations: {
     goTagged(state){
-      state.showTagged = true;
+      state.showPosts = false;
     },
     backPosts(state){
-      state.showTagged = false;
+      state.showPosts = true;
+    },
+    openPhoto(state){
+      state.checkImg = true;
+    },
+    closePhoto(state){
+      state.checkImg = false;
     }
   },
   actions: {

@@ -1,5 +1,5 @@
 <template>
-
+This is single pohto!
 </template>
 
 <script>
