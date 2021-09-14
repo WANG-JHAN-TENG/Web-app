@@ -93,8 +93,7 @@
 export default {
   name: 'Profile',
   props: {
-
-  }
+  },
 }
 </script>
 
