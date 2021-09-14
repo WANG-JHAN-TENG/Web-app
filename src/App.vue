@@ -1,7 +1,7 @@
 <template>
 <Profile></Profile>
-<Posts></Posts>
-<Tagged></Tagged>
+<Posts  v-if="$store.state.showTagged"></Posts>
+<Tagged  v-else></Tagged>
 </template>
 
 <script>

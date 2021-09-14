@@ -80,10 +80,10 @@
   </ul>
 </div>
 <div id="platforms">
-  <div class="posts">
+  <div class="posts" :class="{chosen:isChose}" @click="backPosts">
     <img src="../assets/grid.png" alt="grid" width="20" height="20">
   </div>
-  <div class="tagged">
+  <div class="tagged" :class="{chosen:Chose}" @click="goTagged">
     <img src="../assets/tag.png" alt="tagged" width="20" height="20">
   </div>
 </div>
@@ -93,6 +93,24 @@
 export default {
   name: 'Profile',
   props: {
+  },
+  data(){
+    return{
+      isChose:true,
+      Chose:false,
+    }
+  },
+  methods:{
+    goTagged(){
+      this.$store.commit('goTagged');
+      this.isChose = false;
+      this.Chose = true;
+    },
+    backPosts(){
+      this.$store.commit('backPosts');
+      this.isChose = true;
+      this.Chose = false;
+    }
   },
 }
 </script>
@@ -181,7 +199,7 @@ export default {
   text-align: center;
   cursor: pointer;
 }
-#platforms .posts{
+#platforms .chosen{
   border-bottom: 1px solid black;
 }
 </style>
