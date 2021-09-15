@@ -28,7 +28,7 @@
 <div id="picBar">
   <ul class="pics">
     <li class="pic">
-      <div class="lifePic">
+      <div class="lifePic" @click="openStory">
         <a href="#">
           <img src="https://placeimg.com/50/50/nature" alt="picture">
         </a>
@@ -110,7 +110,10 @@ export default {
       this.$store.commit('backPosts');
       this.isChose = true;
       this.Chose = false;
-    }
+    },
+    openStory(){
+      this.$store.commit('openStory');
+    },
   },
 }
 </script>

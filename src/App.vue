@@ -1,4 +1,5 @@
 <template>
+<Story v-show="$store.state.checkStory"></Story>
 <SinglePhoto v-if="$store.state.checkImg"></SinglePhoto>
 <mainPage v-else>
   <Profile ></Profile>
@@ -10,6 +11,7 @@
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
 import SinglePhoto from './components/SinglePhoto.vue'
+import Story from './components/Story.vue'
 import Profile from './components/Profile.vue'
 import Posts from './components/Posts.vue'
 import Tagged from './components/Tagged.vue'
@@ -19,6 +21,7 @@ export default {
   components: {
     // HelloWorld,
     SinglePhoto,
+    Story,
     Profile,
     Posts,
     Tagged,

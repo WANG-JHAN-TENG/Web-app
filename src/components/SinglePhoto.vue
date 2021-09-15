@@ -93,7 +93,7 @@ export default {
         coms:[
             {
                 id:1,
-                content:'lorem1',
+                content:'I am the first comment!',
             },
         ],
       };
