@@ -1,42 +1,9 @@
 <template>
-<div id="posts">
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-  <div class="post" @click="openPhoto">
-      <img src="https://placeimg.com/121/115/animals" alt="post">
-  </div>
-</div>
+<ul id="posts">
+  <li class="post" v-for="(post,index) in $store.state.posts" :key="index" @click="openPhoto(index)">
+      <div class="img" v-html="post.img"></div>
+  </li>
+</ul>
 <div id="footer">
   <div class="icon">
     <img src="../assets/home.png" alt="homepage" width="25" height="25">
@@ -62,9 +29,15 @@ export default {
   props: {
 
   },
+  data(){
+    return{
+
+    };
+  },
   methods:{
-    openPhoto(){
+    openPhoto(index){
       this.$store.commit('openPhoto');
+      this.$store.state.photoId = index;
     }
   }
 }
@@ -73,15 +46,23 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 #posts{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
 }
 #posts .post{
-  padding-bottom: 3px;
+  margin-bottom: 3px;
   width: 33.3333%;
-  height: 118px;
+  height: 115px;
   cursor: pointer;
+  overflow-y: hidden;
+}
+#posts .post .imgH{
+  position: relative;
+  top: -35px;
 }
 #posts a{
 display: inline-block;

@@ -1,11 +1,11 @@
 <template>
 <Story v-show="$store.state.checkStory"></Story>
 <SinglePhoto v-if="$store.state.checkImg"></SinglePhoto>
-<mainPage v-else>
+<template v-else>
   <Profile ></Profile>
   <Posts  v-if="$store.state.showPosts"></Posts>
   <Tagged  v-else></Tagged>
-</mainPage>
+</template>
 </template>
 
 <script>

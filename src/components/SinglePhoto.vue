@@ -18,7 +18,7 @@
   </div>
 </div>
 <div class="pic">
-  <img src="https://placeimg.com/375/500/animals" alt="picture">
+  <div  v-html="$store.state.posts[$store.state.photoId].imgL"></div>
 </div>
 <div id="action">
   <div class="like">
@@ -49,9 +49,10 @@
   都說讚
 </div>
 <div id="title">
-  jhanteng  大橘的新衣
+  <!-- jhanteng  大橘的新衣
   <br>
-  只穿了十分鐘
+  只穿了十分鐘 -->
+  {{$store.state.posts[$store.state.photoId].title}}
 </div>
 <div id="comments">
   <div class="addCom">
