@@ -1,13 +1,13 @@
 <template>
 <div id="head">
-  <div class="user">jhanteng</div>
+  <div class="user">oragnecatxxl</div>
   <div class="space"></div>
   <div class="plus">+</div>
   <div class="list">|||</div>
 </div>
 <div id="mainBar">
   <div class="userphoto">
-    <img src="https://placeimg.com/100/100/people" alt="userPhoto">
+    <img src="../assets/userphoto.jpg" alt="userPhoto" width="100">
   </div>
   <div class="count">
     <div class="num">121</div>
@@ -23,58 +23,22 @@
   </div>
 </div>
 <div id="intro">
-  <h4>汪展謄</h4>
+  <h4>大橘偷懶中</h4>
+  <span>演員</span>
+  <p>這是一個測試用帳號</p>
+  <p>About my cat</p>
+  <p>He looks like a dog, but he doesn't!</p>
 </div>
 <div id="picBar">
   <ul class="pics">
     <li class="pic">
       <div class="lifePic" @click="openStory">
-        <a href="#">
-          <img src="https://placeimg.com/50/50/nature" alt="picture">
-        </a>
+        <div class="img">
+          <img src="../assets/story1.jpg" alt="picture" width="58">
+        </div>
       </div>
       <div class="title">
-        療癒
-      </div>
-    </li>
-    <li class="pic">
-      <div class="lifePic">
-        <a href="#">
-          <img src="https://placeimg.com/50/50/nature" alt="picture">
-        </a>
-      </div>
-      <div class="title">
-        逮丸的食物
-      </div>
-    </li>
-    <li class="pic">
-      <div class="lifePic">
-        <a href="#">
-          <img src="https://placeimg.com/50/50/nature" alt="picture">
-        </a>
-      </div>
-      <div class="title">
-        邊緣人日常
-      </div>
-    </li>
-    <li class="pic">
-      <div class="lifePic">
-        <a href="#">
-          <img src="https://placeimg.com/50/50/nature" alt="picture">
-        </a>
-      </div>
-      <div class="title">
-        出遊出油
-      </div>
-    </li>
-    <li class="pic">
-      <div class="lifePic">
-        <a href="#">
-          <img src="https://placeimg.com/50/50/nature" alt="picture">
-        </a>
-      </div>
-      <div class="title">
-        玩玩具
+        只是一個形象
       </div>
     </li>
   </ul>
@@ -127,6 +91,7 @@ export default {
   top: 0;
   font-size: 1.5rem;
   background: rgb(255, 255, 255);
+  z-index: 3;
 }
 #head .user{
   margin-left: 10px;
@@ -172,8 +137,18 @@ export default {
 #intro{
   margin: 15px;
 }
+#intro span{
+  margin: 1px 0;
+  font-size: 0.8rem;
+  color: #7c7c7c;
+}
 #intro h4{
-  font-weight: 200;
+  margin: 1px 0;
+  font-weight: 600;
+}
+#intro p{
+  margin: 1px 0;
+  font-size: 0.8rem;
 }
 #picBar .pics{
   display: flex;
@@ -184,11 +159,30 @@ export default {
 }
 #picBar .pic{
   width: 20%;
+  text-align: center;
 }
-#picBar img{
+#picBar .lifePic{
+  margin: 7px auto;
   padding: 3px;
+  width: 55px;
+  height: 55px;
+  cursor: pointer;
   border: 1px solid #7c7c7c;
   border-radius: 50%;
+}
+#picBar .img{
+  width: 47px;
+  height: 47px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+#picBar img{
+  position: relative;
+  top: -25%;
+  left: -20%;
+}
+#picBar .title{
+  margin-top: 8px;
 }
 #platforms{
   display: flex;

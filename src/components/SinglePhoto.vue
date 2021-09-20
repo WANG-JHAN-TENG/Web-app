@@ -8,7 +8,7 @@
 </div>
 <div id="userInfo">
   <div class="userPhoto">
-    <img src="https://placeimg.com/30/30/people" alt="">
+    <img src="../assets/userphoto.jpg" alt="userPhoto" width="30">
   </div>
   <div class="user">
     jhanteng
@@ -18,7 +18,7 @@
   </div>
 </div>
 <div class="pic">
-  <div  v-html="$store.state.posts[$store.state.photoId].imgL"></div>
+  <div  v-html="getPost[index].imgL"></div>
 </div>
 <div id="action">
   <div class="like">
@@ -52,7 +52,7 @@
   <!-- jhanteng  大橘的新衣
   <br>
   只穿了十分鐘 -->
-  {{$store.state.posts[$store.state.photoId].title}}
+  {{getPost[index].title}}
 </div>
 <div id="comments">
   <div class="addCom">
@@ -98,6 +98,14 @@ export default {
             },
         ],
       };
+  },
+  computed:{
+    getPost(){
+      return this.$store.state.posts;
+    },
+    index(){
+      return this.$store.state.photoId;
+    }
   },
   methods: {
     closePhoto(){

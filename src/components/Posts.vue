@@ -1,6 +1,6 @@
 <template>
 <ul id="posts">
-  <li class="post" v-for="(post,index) in $store.state.posts" :key="index" @click="openPhoto(index)">
+  <li class="post" v-for="(post,index) in singlePost" :key="index" @click="openPhoto(index)">
       <div class="img" v-html="post.img"></div>
   </li>
 </ul>
@@ -33,6 +33,11 @@ export default {
     return{
 
     };
+  },
+  computed:{
+    singlePost(){
+      return this.$store.state.posts;
+    }
   },
   methods:{
     openPhoto(index){
