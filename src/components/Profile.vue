@@ -66,12 +66,12 @@ export default {
   },
   methods:{
     goTagged(){
-      this.$store.commit('goTagged');
+      this.$store.commit('setShowPosts',false);
       this.isChose = false;
       this.Chose = true;
     },
     backPosts(){
-      this.$store.commit('backPosts');
+      this.$store.commit('setShowPosts',true);
       this.isChose = true;
       this.Chose = false;
     },

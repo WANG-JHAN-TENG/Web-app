@@ -41,8 +41,7 @@ export default {
   },
   methods:{
     openPhoto(index){
-      this.$store.commit('openPhoto');
-      this.$store.state.photoId = index;
+      this.$store.commit('openPhoto',index);
     }
   }
 }

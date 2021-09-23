@@ -1,9 +1,9 @@
 <template>
-<Story v-show="$store.state.checkStory"></Story>
-<SinglePhoto v-if="$store.state.checkImg"></SinglePhoto>
+<Story v-show="goCheckStory"></Story>
+<SinglePhoto v-if="goCheckImg"></SinglePhoto>
 <template v-else>
   <Profile ></Profile>
-  <Posts  v-if="$store.state.showPosts"></Posts>
+  <Posts  v-if="showPosts"></Posts>
   <Tagged  v-else></Tagged>
 </template>
 </template>
@@ -25,7 +25,18 @@ export default {
     Profile,
     Posts,
     Tagged,
-  }
+  },
+  computed:{
+    goCheckStory(){
+      return this.$store.state.checkStory;
+    },
+    goCheckImg(){
+      return this.$store.state.checkImg;
+    },
+    showPosts(){
+      return this.$store.state.showPosts;
+    }
+  },
 }
 </script>
 

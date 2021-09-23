@@ -70,14 +70,12 @@ export default createStore({
     photoId:null,
   },
   mutations: {
-    goTagged(state){
-      state.showPosts = false;
+    setShowPosts(state,status){
+      state.showPosts = status;
     },
-    backPosts(state){
-      state.showPosts = true;
-    },
-    openPhoto(state){
+    openPhoto(state,index){
       state.checkImg = true;
+      state.photoId = index;
     },
     closePhoto(state){
       state.checkImg = false;

@@ -2,7 +2,7 @@
 <div id="head">
   <div class="undo" @click="closePhoto">&#60;</div>
   <div class="whoPost">
-    JHANTENG
+    ORANGECATXXL
     <h4>貼文</h4>
   </div>
 </div>
@@ -11,7 +11,7 @@
     <img src="../assets/userphoto.jpg" alt="userPhoto" width="30">
   </div>
   <div class="user">
-    jhanteng
+    oragnecatxxl
   </div>
   <div class="edit">
     ...
@@ -49,9 +49,6 @@
   都說讚
 </div>
 <div id="title">
-  <!-- jhanteng  大橘的新衣
-  <br>
-  只穿了十分鐘 -->
   {{getPost[index].title}}
 </div>
 <div id="comments">
@@ -113,7 +110,9 @@ export default {
     },
     openComment(){
       this.addNewCom = true;
-      this.$refs.autoFocus.focus();
+      this.$nextTick(()=> {
+       this.$refs.autoFocus.focus();
+      });
     },
     closeComment(){
       this.addNewCom = false;
