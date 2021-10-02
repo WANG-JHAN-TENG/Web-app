@@ -10,28 +10,20 @@ export default createStore({
     postId:[],
     showPosts:true,
     checkImg:false,
+    aPost:{},
     checkStory:false,
     photoId:null,
   },
   mutations: {
-    login(){
-      const vm = this;
-      window.FB.getLoginStatus(function(response) {
-        if (response.status === "connected") {
-          console.log(response);
-          vm.state.profile = response.authResponse;
-        } else {
-          window.FB.login(
-            function(res) {
-              console.log(res);
-              vm.state.profile = res.authResponse;
-            },
-            { scope: "instagram_basic,pages_read_engagement,pages_show_list" },
-          );
-        }
-      });
+    login(state,response,res){
+      if(response){
+        state.profile = response.authResponse;
+      }else{
+        state.profile = res.authResponse;
+      }
     },
     logout(){
+      const vm = this;
       window.FB.getLoginStatus(function(response) {
         if (response.status === "connected") {
           window.FB.api("/me/permissions", "DELETE", function(res) {
@@ -42,6 +34,8 @@ export default createStore({
           // do something
         }
       });
+      vm.state.profile = {};
+      vm.state.posts = [];
     },
     setShowPosts(state,status){
       state.showPosts = status;
@@ -62,8 +56,12 @@ export default createStore({
       state.checkImg = true;
       state.photoId = index;
     },
+    getAPost(state,response){
+      state.aPost = response.data;
+    },
     closePhoto(state){
       state.checkImg = false;
+      state.aPost = {};
     },
     openStory(state){
       state.checkStory = true;
@@ -96,6 +94,26 @@ export default createStore({
           fjs.parentNode.insertBefore(js, fjs);
         })(document, "script", "facebook-jssdk");
       }
+    },
+    login({commit}){
+      return new Promise((resolve) =>{
+        window.FB.getLoginStatus(function(response) {
+          if (response.status === "connected") {
+            console.log(response);
+            commit('login',response)
+            resolve()
+          } else {
+            window.FB.login(
+              function(res) {
+                console.log(res);
+                commit('login',res)
+                resolve()
+              },
+              { scope: "instagram_basic,pages_read_engagement,pages_show_list" },
+            );
+          }
+        });
+      })
     },
     getPosts({commit}){
       return new Promise((resolve) =>{
@@ -144,31 +162,34 @@ export default createStore({
         })
       })
     },
-    getPost({state}){
+    getAPost({state,commit}){
       return new Promise((resolve) =>{
-        let id = 0
+        let id = state.photoId
         let postID = state.postId[id].id
         let token = state.profile.accessToken;
         let url = 'https://graph.facebook.com/v12.0/' + postID + 
         '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
         axios.get(url).then((response) =>{
           console.log(response)
+          commit('getAPost',response)
           resolve()
         })
       })
     },
     showPage({dispatch}){
-      return dispatch('getPageId')
+      return dispatch('login')
+      .then(() =>{
+        return dispatch('getPageId')
+      })
       .then(() =>{
         return dispatch('getIGID')
       })
       .then(() =>{
         return dispatch('getPostId')
+      }).then(() =>{
+        return dispatch('getPosts')
       })
-      .then(() =>{
-        return dispatch('getPost')
-      })
-    }
+    },
   },
   modules: {
   }

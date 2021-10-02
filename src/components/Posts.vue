@@ -44,6 +44,7 @@ export default {
   methods:{
     openPhoto(index){
       this.$store.commit('openPhoto',index);
+      this.$store.dispatch('getAPost');
     }
   }
 }

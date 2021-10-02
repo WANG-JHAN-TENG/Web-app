@@ -74,9 +74,7 @@ export default {
   },
   methods:{
     login() {
-      this.$store.commit('login');
       this.toLogIn = false;
-      this.$store.dispatch('getPosts');
       this.$store.dispatch("showPage");
     },
     logout() {

@@ -18,7 +18,9 @@
   </div>
 </div>
 <div class="pic">
-  <div  v-html="getPost[index].imgL"></div>
+  <div>
+    <img :src=aPost.media_url alt="photograph" width="375">
+  </div>
 </div>
 <div id="action">
   <div class="like">
@@ -44,12 +46,12 @@
   <div class="miniImg3">
     <img src="https://placeimg.com/20/20/people" alt="">
   </div>
-  hsuwanttting和
-  <span>其他17人</span>
+  {{aPost.like_count}}
+  <span>人</span>
   都說讚
 </div>
 <div id="title">
-  {{getPost[index].title}}
+  {{aPost.caption}}
 </div>
 <div id="comments">
   <div class="addCom">
@@ -97,11 +99,8 @@ export default {
       };
   },
   computed:{
-    getPost(){
-      return this.$store.state.posts;
-    },
-    index(){
-      return this.$store.state.photoId;
+    aPost(){
+      return this.$store.state.aPost;
     }
   },
   methods: {
