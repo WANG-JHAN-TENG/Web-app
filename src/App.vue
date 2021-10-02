@@ -35,11 +35,6 @@ export default {
     goCheckStory(){
       return this.$store.state.checkStory;
     },
-    goCheckNewStory(){
-      if(this.$store.state.checkNewStory && this.$store.state.story){
-          return this.$store.state.checkNewStory;
-      }
-    },
     goCheckImg(){
       return this.$store.state.checkImg;
     },
@@ -47,6 +42,15 @@ export default {
       return this.$store.state.showPosts;
     }
   },
+  methods:{
+    goCheckNewStory(){
+      if(this.$store.state.checkNewStory && this.$store.state.story){
+          return this.$store.state.checkNewStory;
+      }else{
+        console.log("No new post")
+      }
+    },
+  }
 }
 </script>
 
