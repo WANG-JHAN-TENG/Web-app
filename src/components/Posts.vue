@@ -1,7 +1,9 @@
 <template>
 <ul id="posts">
-  <li class="post" v-for="(post,index) in singlePost" :key="index" @click="openPhoto(index)">
-      <div class="img" v-html="post.img"></div>
+  <li class="post" v-for="(post,index) in posts" :key="index" @click="openPhoto(index)">
+      <div class="img">
+        <img :src=post.media_url alt="post" width="121">
+      </div>
   </li>
 </ul>
 <div id="footer">
@@ -35,7 +37,7 @@ export default {
     };
   },
   computed:{
-    singlePost(){
+    posts(){
       return this.$store.state.posts;
     }
   },

@@ -1,9 +1,13 @@
 <template>
+<div id="login" v-show="toLogIn">
+  <button @click="login">LOGIN</button>
+  <button @click="logout">LOGOUT</button>
+</div>
 <div id="head">
   <div class="user">oragnecatxxl</div>
   <div class="space"></div>
   <div class="plus">+</div>
-  <div class="list">|||</div>
+  <div class="list" @click="openLogIn">|||</div>
 </div>
 <div id="mainBar">
   <div class="userphoto">
@@ -60,11 +64,31 @@ export default {
   },
   data(){
     return{
+      toLogIn:false,
       isChose:true,
       Chose:false,
     }
   },
+  created(){
+    this.$store.dispatch("fbInit");
+  },
   methods:{
+    login() {
+      this.$store.commit('login');
+      this.toLogIn = false;
+      this.$store.dispatch('getPosts');
+      this.$store.dispatch("showPage");
+    },
+    logout() {
+      this.$store.commit("logout");
+    },
+    openLogIn(){
+      if(this.toLogIn == false){
+        this.toLogIn = true;
+      }else{
+        this.toLogIn = false;
+      }
+    },
     goTagged(){
       this.$store.commit('setShowPosts',false);
       this.isChose = false;
@@ -84,6 +108,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#login{
+  display: flex;
+  justify-content:space-evenly;
+}
+#login button{
+  border: none;
+  cursor: pointer;
+  background: royalblue;
+  color: white;
+}
 #head{
   display: flex;
   padding: 10px 6px;
