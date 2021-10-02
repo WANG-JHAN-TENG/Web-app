@@ -1,11 +1,14 @@
 <template>
-<Story v-show="goCheckStory"></Story>
-<SinglePhoto v-if="goCheckImg"></SinglePhoto>
-<template v-else>
-  <Profile ></Profile>
-  <Posts  v-if="showPosts"></Posts>
-  <Tagged  v-else></Tagged>
-</template>
+  <Story v-show="goCheckStory"></Story>
+  <NewStory v-if="goCheckNewStory"></NewStory>
+  <template v-else>
+    <SinglePhoto v-if="goCheckImg"></SinglePhoto>
+    <template v-else>
+      <Profile ></Profile>
+      <Posts  v-if="showPosts"></Posts>
+      <Tagged  v-else></Tagged>
+    </template>
+  </template>
 </template>
 
 <script>
@@ -15,6 +18,7 @@ import Story from './components/Story.vue'
 import Profile from './components/Profile.vue'
 import Posts from './components/Posts.vue'
 import Tagged from './components/Tagged.vue'
+import NewStory from './components/NewStory.vue'
 
 export default {
   name: 'App',
@@ -25,10 +29,16 @@ export default {
     Profile,
     Posts,
     Tagged,
+    NewStory,
   },
   computed:{
     goCheckStory(){
       return this.$store.state.checkStory;
+    },
+    goCheckNewStory(){
+      if(this.$store.state.checkNewStory && this.$store.state.story){
+          return this.$store.state.checkNewStory;
+      }
     },
     goCheckImg(){
       return this.$store.state.checkImg;

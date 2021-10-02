@@ -8,10 +8,13 @@ export default createStore({
     pageId:"",
     igUserId:"",
     postId:[],
+    storyId:[],
+    story:"",
     showPosts:true,
     checkImg:false,
     aPost:{},
     checkStory:false,
+    checkNewStory:false,
     photoId:null,
   },
   mutations: {
@@ -52,6 +55,12 @@ export default createStore({
     getPostId(state,response){
       state.postId = response.data.data;
     },
+    getStoryID(state,response){
+      state.storyId = response.data.data[0].id
+    },
+    getStory(state,response){
+      state.story = response.data.media_url
+    },
     openPhoto(state,index){
       state.checkImg = true;
       state.photoId = index;
@@ -62,6 +71,12 @@ export default createStore({
     closePhoto(state){
       state.checkImg = false;
       state.aPost = {};
+    },
+    checkNewStory(state){
+      state.checkNewStory = true;
+    },
+    closeNewStory(state){
+      state.checkNewStory = false;
     },
     openStory(state){
       state.checkStory = true;
@@ -109,7 +124,7 @@ export default createStore({
                 commit('login',res)
                 resolve()
               },
-              { scope: "instagram_basic,pages_read_engagement,pages_show_list" },
+              { scope: "instagram_basic,pages_read_engagement,pages_show_list,instagram_manage_insights" },
             );
           }
         });
@@ -162,6 +177,30 @@ export default createStore({
         })
       })
     },
+    getStoryID({state,commit}){
+      return new Promise((resolve) =>{
+        let igUserId = state.igUserId;
+        let token = state.profile.accessToken;
+        let url = 'https://graph.facebook.com/v12.0/' + igUserId + '/stories?access_token=' + token
+        axios.get(url).then((response) =>{
+          console.log(response)
+          commit('getStoryID',response)
+          resolve()
+        })
+      })
+    },
+    getStory({state,commit}){
+      return new Promise((resolve) =>{
+        let storyId = state.storyId;
+        let token = state.profile.accessToken;
+        let url = 'https://graph.facebook.com/v12.0/' + storyId + '?fields=media_url&access_token=' +token
+        axios.get(url).then((response) =>{
+          console.log(response)
+          commit('getStory',response)
+          resolve()
+        })
+      })
+    },
     getAPost({state,commit}){
       return new Promise((resolve) =>{
         let id = state.photoId
@@ -186,8 +225,15 @@ export default createStore({
       })
       .then(() =>{
         return dispatch('getPostId')
-      }).then(() =>{
+      })
+      .then(() =>{
         return dispatch('getPosts')
+      })
+      .then(() =>{
+        return dispatch('getStoryID')
+      })
+      .then(() =>{
+        return dispatch('getStory')
       })
     },
   },

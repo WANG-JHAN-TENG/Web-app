@@ -1,5 +1,6 @@
 <template>
 <div id="login" v-show="toLogIn">
+  {{this.$store.state.story}}
   <button @click="login">LOGIN</button>
   <button @click="logout">LOGOUT</button>
 </div>
@@ -10,7 +11,7 @@
   <div class="list" @click="openLogIn">|||</div>
 </div>
 <div id="mainBar">
-  <div class="userphoto">
+  <div class="userphoto" @click="checkNewStory">
     <img src="../assets/userphoto.jpg" alt="userPhoto" width="100">
   </div>
   <div class="count">
@@ -80,6 +81,9 @@ export default {
     },
     logout() {
       this.$store.commit("logout");
+    },
+    checkNewStory(){
+      this.$store.commit('checkNewStory');
     },
     openLogIn(){
       if(this.toLogIn == false){
@@ -153,6 +157,7 @@ export default {
 }
 #mainBar .userphoto{
   margin-right: 30px;
+  cursor: pointer;
 }
 #mainBar .userphoto img{
   border: none;
