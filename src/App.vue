@@ -1,6 +1,6 @@
 <template>
   <Story v-show="goCheckStory"></Story>
-  <NewStory v-if="goCheckNewStory"></NewStory>
+  <NewStory v-if="goCheckNewStory == true && checkStory"></NewStory>
   <template v-else>
     <SinglePhoto v-if="goCheckImg"></SinglePhoto>
     <template v-else>
@@ -35,6 +35,12 @@ export default {
     goCheckStory(){
       return this.$store.state.checkStory;
     },
+    goCheckNewStory(){
+      return this.$store.state.checkNewStory;
+    },
+    checkStory(){
+      return this.$store.state.story;
+    },
     goCheckImg(){
       return this.$store.state.checkImg;
     },
@@ -42,15 +48,6 @@ export default {
       return this.$store.state.showPosts;
     }
   },
-  methods:{
-    goCheckNewStory(){
-      if(this.$store.state.checkNewStory && this.$store.state.story){
-          return this.$store.state.checkNewStory;
-      }else{
-        console.log("No new post")
-      }
-    },
-  }
 }
 </script>
 

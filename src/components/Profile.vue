@@ -1,6 +1,5 @@
 <template>
 <div id="login" v-show="toLogIn">
-  {{this.$store.state.story}}
   <button @click="login">LOGIN</button>
   <button @click="logout">LOGOUT</button>
 </div>
