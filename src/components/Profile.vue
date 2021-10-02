@@ -74,6 +74,7 @@ export default {
   },
   methods:{
     login() {
+      alert("Please log in with account:0983423002 password:letstrythis")
       this.toLogIn = false;
       this.$store.dispatch("showPage");
     },
