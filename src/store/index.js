@@ -7,12 +7,20 @@ export default createStore({
     posts:[],
     pageId:"",
     igUserId:"",
+    basicInfo:{},
     postId:[],
-    storyId:[],
     story:"",
+    mentionedLists:[],
     showPosts:true,
+    isChose:true,
+    Chose:false,
     checkImg:false,
     aPost:{},
+    comments:[],
+    commentIndex:"",
+    comInComs:[],
+    addCom:"",
+    deleteId:"",
     checkStory:false,
     checkNewStory:false,
     photoId:null,
@@ -38,7 +46,9 @@ export default createStore({
         }
       });
       vm.state.profile = {};
+      vm.state.basicInfo = {};
       vm.state.posts = [];
+      vm.state.mentionedLists = [];
     },
     setShowPosts(state,status){
       state.showPosts = status;
@@ -52,14 +62,17 @@ export default createStore({
     getIGID(state,response){
         state.igUserId = response.data.instagram_business_account.id;
     },
+    basicInfo(state,response){
+      state.basicInfo = response.data
+    },
     getPostId(state,response){
       state.postId = response.data.data;
     },
-    getStoryID(state,response){
-      state.storyId = response.data.data[0].id
-    },
     getStory(state,response){
       state.story = response.data.media_url
+    },
+    mentionedList(state,response){
+      state.mentionedLists = response.data.data
     },
     openPhoto(state,index){
       state.checkImg = true;
@@ -68,9 +81,23 @@ export default createStore({
     getAPost(state,response){
       state.aPost = response.data;
     },
+    getATaggedPost(state){
+      state.aPost = state.mentionedLists[state.photoId]
+    },
+    getComments(state,response){
+      if(state.showPosts == true){
+        state.comments = response.data.data
+      }else{
+        state.comments = response.data.mentioned_media.comments.data
+      }
+    },
+    checkComInCom(state,response){
+      state.comInComs = response.data.data
+    },
     closePhoto(state){
       state.checkImg = false;
       state.aPost = {};
+      state.comments = [];
     },
     checkNewStory(state){
       state.checkNewStory = true;
@@ -87,47 +114,52 @@ export default createStore({
   },
   actions: {
     fbInit(){
-      if (!window.FB) {
-        window.fbAsyncInit = function() {
-          window.FB.init({
-            appId: "4330660170304385",
-            cookie: true,
-            xfbml: true,
-            version: "v12.0"
-          });
-        };
-  
-        (function(d, s, id) {
-          var js,
-            fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) {
-            return;
-          }
-          js = d.createElement(s);
-          js.id = id;
-          js.src = "https://connect.facebook.net/en_US/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
-        })(document, "script", "facebook-jssdk");
-      }
+      return new Promise((resolve) =>{
+        if (!window.FB) {
+          window.fbAsyncInit = function() {
+            window.FB.init({
+              appId: "4330660170304385",
+              cookie: true,
+              xfbml: true,
+              version: "v12.0"
+            });
+            resolve()
+          };
+          (function(d, s, id) {
+            var js,
+              fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+              return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+          })(document, "script", "facebook-jssdk");
+        }
+      })
     },
-    login({commit}){
+    checkLoginOrNot({commit}){
       return new Promise((resolve) =>{
         window.FB.getLoginStatus(function(response) {
           if (response.status === "connected") {
             console.log(response);
             commit('login',response)
             resolve()
-          } else {
-            window.FB.login(
-              function(res) {
-                console.log(res);
-                commit('login',res)
-                resolve()
-              },
-              { scope: "instagram_basic,pages_read_engagement,pages_show_list,instagram_manage_insights" },
-            );
           }
         });
+      })
+    },
+    login({commit}){
+      return new Promise((resolve) =>{
+        window.FB.login(
+          function(res) {
+            console.log(res);
+            commit('login',res)
+            resolve()
+          },
+          { scope: "instagram_basic,pages_read_engagement,pages_show_list,instagram_manage_insights,instagram_manage_comments" },
+        );
       })
     },
     getPosts({commit}){
@@ -165,6 +197,18 @@ export default createStore({
         })
       })
     },
+    basicInfo({state,commit}){
+      return new Promise((resolve) =>{
+        let igUserId = state.igUserId;
+        let token = state.profile.accessToken;
+        let url = 'https://graph.facebook.com/v12.0/' + igUserId + '?fields=followers_count%2Cmedia_count%2Cbiography%2Cfollows_count%2Cname%2Cprofile_picture_url%2Cusername&access_token=' + token
+        axios.get(url).then((response) =>{
+          console.log(response)
+          commit('basicInfo',response)
+          resolve()
+        })
+      })
+    },
     getPostId({state,commit}){
       return new Promise((resolve) =>{
         let igUserId = state.igUserId;
@@ -184,14 +228,13 @@ export default createStore({
         let url = 'https://graph.facebook.com/v12.0/' + igUserId + '/stories?access_token=' + token
         axios.get(url).then((response) =>{
           console.log(response)
-          commit('getStoryID',response)
-          resolve()
+          resolve(response)
         })
       })
     },
-    getStory({state,commit}){
+    getStory({state,commit},response){
       return new Promise((resolve) =>{
-        let storyId = state.storyId;
+        let storyId = response.data.data[0].id
         let token = state.profile.accessToken;
         let url = 'https://graph.facebook.com/v12.0/' + storyId + '?fields=media_url&access_token=' +token
         axios.get(url).then((response) =>{
@@ -201,27 +244,126 @@ export default createStore({
         })
       })
     },
-    getAPost({state,commit}){
+    mentionedList({state,commit}){
       return new Promise((resolve) =>{
-        let id = state.photoId
-        let postID = state.postId[id].id
+        let igUserId = state.igUserId
         let token = state.profile.accessToken;
-        let url = 'https://graph.facebook.com/v12.0/' + postID + 
-        '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+        let url = 'https://graph.facebook.com/v12.0/' + igUserId + '/tags?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
         axios.get(url).then((response) =>{
           console.log(response)
-          commit('getAPost',response)
+          commit('mentionedList',response)
           resolve()
         })
       })
     },
-    showPage({dispatch}){
-      return dispatch('login')
+    getAPost({state,commit}){
+      return new Promise((resolve) =>{
+        if(state.showPosts == true){
+          let id = state.photoId
+          let postID = state.postId[id].id
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + postID + 
+          '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+          axios.get(url).then((response) =>{
+            console.log(response)
+            commit('getAPost',response)
+            resolve()
+          })
+        }else{
+          commit('getATaggedPost')
+          resolve()
+        }
+      })
+    },
+    getComments({state,commit}){
+      return new Promise((resolve) =>{
+        if(state.showPosts == true){
+          let id = state.photoId
+          let postID = state.postId[id].id
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + postID + '/comments?access_token=' + token
+          axios.get(url).then((response) =>{
+            console.log(response)
+            commit('getComments',response)
+            resolve()
+          })
+        }else{
+          let igUserId = state.igUserId 
+          let id = state.photoId
+          let postID = state.mentionedLists[id].id
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + igUserId + '?fields=mentioned_media.media_id(' + postID + ')%7Bcaption%2Ccomments%7D&access_token=' +token
+          axios.get(url).then((response) =>{
+            console.log(response)
+            commit('getComments',response)
+            resolve()
+          })
+        }
+      })
+    },
+    ckeckComInCom({state,commit}){
+      return new Promise((resolve) =>{
+        let index = state.commentIndex;
+        let commentID = state.comments[index].id
+        let token = state.profile.accessToken;
+        let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?access_token=' + token
+        axios.get(url).then((response) =>{
+          console.log(response)
+          commit('checkComInCom',response)
+          resolve()
+        })
+      })
+    },
+    createCom({state}){
+      return new Promise((resolve) =>{
+        let index = state.commentIndex;
+        let commentID = state.comments[index].id
+        let addCom = state.addCom
+        let token = state.profile.accessToken;
+        let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?message=' + addCom +'&access_token=' + token
+        axios.post(url).then((response) =>{
+          console.log('Add '+ response + ' success!')
+          resolve()
+        })
+      })
+    },
+    refreshCom({dispatch}){
+      return dispatch('createCom')
+      .then(() =>{
+        return dispatch('ckeckComInCom')
+      })
+    },
+    deleteCom({state}){
+      return new Promise((resolve) =>{
+        let index = state.deleteId;
+        let commentId = state.comments[index].id
+        let token = state.profile.accessToken;
+        let url = "https://graph.facebook.com/v12.0/" + commentId + "?access_token=" + token
+        axios.delete(url).then((response) =>{
+          console.log(response)
+          resolve()
+        })
+      })
+    },
+    afterDelete({dispatch}){
+      return dispatch('deleteCom')
+      .then(() =>{
+        return dispatch('getComments')
+      })
+    },
+    initAndShow({dispatch}){
+      return dispatch('fbInit')
+      .then(() =>{
+        return dispatch('checkLoginOrNot')
+      })
       .then(() =>{
         return dispatch('getPageId')
       })
       .then(() =>{
         return dispatch('getIGID')
+      })
+      .then(() =>{
+        return dispatch('basicInfo')
       })
       .then(() =>{
         return dispatch('getPostId')
@@ -232,8 +374,32 @@ export default createStore({
       .then(() =>{
         return dispatch('getStoryID')
       })
+      .then((response) =>{
+        return dispatch('getStory',response)
+      })
+    },
+    loginAndShow({dispatch}){
+      return dispatch('login')
       .then(() =>{
-        return dispatch('getStory')
+        return dispatch('getPageId')
+      })
+      .then(() =>{
+        return dispatch('getIGID')
+      })
+      .then(() =>{
+        return dispatch('basicInfo')
+      })
+      .then(() =>{
+        return dispatch('getPostId')
+      })
+      .then(() =>{
+        return dispatch('getPosts')
+      })
+      .then(() =>{
+        return dispatch('getStoryID')
+      })
+      .then((response) =>{
+        return dispatch('getStory',response)
       })
     },
   },

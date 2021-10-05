@@ -7,20 +7,22 @@
   </li>
 </ul>
 <div id="footer">
-  <div class="icon">
-    <img src="../assets/home.png" alt="homepage" width="25" height="25">
-  </div>
-  <div class="icon">
-    <img src="../assets/search.png" alt="search" width="25" height="25">
-  </div>
-  <div class="icon">
-    <img src="../assets/plus-sign.png" alt="plus-sign" width="25" height="25">
-  </div>
-  <div class="icon">
-    <img src="../assets/shopping-bag.png" alt="shopping-bag" width="25" height="25">
-  </div>
-  <div class="icon">
-    <img src="../assets/profile-user.png" alt="profile-user" width="25" height="25">
+  <div class="icons">
+    <div class="icon">
+      <img src="../assets/home.png" alt="homepage" width="25" height="25">
+    </div>
+    <div class="icon">
+      <img src="../assets/search.png" alt="search" width="25" height="25">
+    </div>
+    <div class="icon">
+      <img src="../assets/plus-sign.png" alt="plus-sign" width="25" height="25">
+    </div>
+    <div class="icon">
+      <img src="../assets/shopping-bag.png" alt="shopping-bag" width="25" height="25">
+    </div>
+    <div class="icon">
+      <img src="../assets/profile-user.png" alt="profile-user" width="25" height="25">
+    </div>
   </div>
 </div>
 </template>
@@ -45,6 +47,7 @@ export default {
     openPhoto(index){
       this.$store.commit('openPhoto',index);
       this.$store.dispatch('getAPost');
+      this.$store.dispatch('getComments');
     }
   }
 }
@@ -72,13 +75,16 @@ export default {
   top: -35px;
 }
 #posts a{
-display: inline-block;
+  display: inline-block;
 }
 #footer{
+  height: 49.8px;
+}
+.icons{
   display: flex;
   justify-content: space-around;
-  align-content: center;
-  position: sticky;
+  width: 375px;
+  position: fixed;
   bottom: 0px;
   background: white;
 }

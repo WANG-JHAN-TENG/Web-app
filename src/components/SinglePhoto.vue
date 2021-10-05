@@ -27,7 +27,7 @@
     <img src="../assets/heart.png" alt="like" width="20" height="20">
   </div>
   <div class="comment">
-    <img src="../assets/comment.png" alt="comment" width="20" height="20" @click="openComment">
+    <img src="../assets/comment.png" alt="comment" width="20" height="20">
   </div>
   <div class="share">
     <img src="../assets/share.png" alt="share" width="20" height="20">
@@ -56,24 +56,24 @@
 <div id="comments">
   <div class="addCom">
     <input type="text" v-show="addNewCom" v-model="newCom" @keyup.enter="createCom" 
-    @keyup.esc="closeComment" placeholder="留言......" ref="autoFocus">
+    @keyup.esc="closeComment" placeholder="回覆留言......" ref="autoFocus">
   </div>
   <ul class="comList">
-    <li v-for="(com,index) in coms" :key="index" data-id="com.id">
+    <li v-for="(comment,index) in comments" :key="comment.id">
       <div
-        v-show="editModeId !== com.id"
         class="content"
-        @dblclick="enterEditMode(com ,$event)"
+        @click="ckeckComInCom(index)"
+        @dblclick="deleteCom(index)"
       >
-        {{com.content}}
+        {{comment.text}}
+        <div v-if="commentIndex == index">
+          <div class="comInCom"
+            v-for="comInCom in comInComs" :key="comInCom.id"
+          >
+            {{comInCom.text}}
+          </div>
+        </div>
       </div>
-      <input
-        v-show="editModeId === com.id"
-        v-model="com.content"
-        @keyup.enter="updateCom"
-        @keyup.esc="cancelUpdateCom(com)"
-      />
-      <div class="delete" v-show="editModeId === com.id" @click="deleteCom(com,index)">x</div>
     </li>
   </ul>
 </div>
@@ -87,27 +87,30 @@ export default {
   data() {
       return {
         addNewCom:false,
-        newCom:'',
-        editModeId:null,
-        beforeUpdate:"",
-        coms:[
-            {
-                id:1,
-                content:'I am the first comment!',
-            },
-        ],
+        newCom:"",
       };
   },
   computed:{
     aPost(){
       return this.$store.state.aPost;
-    }
+    },
+    comments(){
+      return this.$store.state.comments;
+    },
+    comInComs(){
+      return this.$store.state.comInComs;
+    },
+    commentIndex(){
+      return this.$store.state.commentIndex;
+    },
   },
   methods: {
     closePhoto(){
       this.$store.commit('closePhoto');
     },
-    openComment(){
+    ckeckComInCom(index){
+      this.$store.state.commentIndex = index;
+      this.$store.dispatch('ckeckComInCom')
       this.addNewCom = true;
       this.$nextTick(()=> {
        this.$refs.autoFocus.focus();
@@ -117,38 +120,17 @@ export default {
       this.addNewCom = false;
     },
     createCom(){
-        let newCom = {
-            id: this.coms.length +1,
-            content:this.newCom,
-        };
-        this.coms.push(newCom);
-
-        this.newCom = '';
-        this.addNewCom = false;
+      this.$store.state.addCom = this.newCom
+      this.$store.dispatch('refreshCom')
+      this.newCom = "";
     },
-    enterEditMode(com,e){
-        let input = e.target.nextElementSibling;
-        this.editModeId = com.id;
-        this.beforeUpdate = com.content;
-        this.$nextTick(()=>{
-            input.focus();
-        });
-    },
-    updateCom(){
-        this.leaveEditMode()
-    },
-    cancelUpdateCom(com){
-        com.content = this.beforeUpdate;
-        this.leaveEditMode()
-    },
-    leaveEditMode(){
-        this.editModeId = null;
-    },
-    deleteCom(com,index){
-        let result = confirm(`Delete comment: "${com.content}"?`);
-        if  (result){
-            this.coms.splice(index,1);
-        }
+    deleteCom(index){
+      this.$store.state.deleteId = index;
+      let message = this.$store.state.comments[index].text
+      let result = confirm("Delete comment " + message + " ?");
+      if  (result){
+          this.$store.dispatch('afterDelete')
+      }
     },
   },
 }
@@ -187,8 +169,15 @@ export default {
   padding: 0 10px;
   margin-bottom: 7px;
 }
-#userInfo .userPhoto img{
+#userInfo .userPhoto{
+  padding: 1px;
+  width: 34px;
+  height: 34px;
   border: 1px solid #ccc;
+  border-radius: 50%;
+}
+#userInfo .userPhoto img{
+  /* border: 1px solid #ccc; */
   border-radius: 50%;
 }
 #userInfo .user{
@@ -257,6 +246,10 @@ export default {
 }
 #comments li{
   display: flex;
+  margin-top: 10px;
+}
+#comments .comInCom{
+  margin-left: 10px;
 }
 #comments .content{
   flex: 1;

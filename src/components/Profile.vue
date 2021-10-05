@@ -4,34 +4,32 @@
   <button @click="logout">LOGOUT</button>
 </div>
 <div id="head">
-  <div class="user">oragnecatxxl</div>
+  <div class="user">{{basicInfo.username}}</div>
   <div class="space"></div>
   <div class="plus">+</div>
   <div class="list" @click="openLogIn">|||</div>
 </div>
 <div id="mainBar">
   <div class="userphoto" @click="checkNewStory">
-    <img src="../assets/userphoto.jpg" alt="userPhoto" width="100">
+    <img :src=basicInfo.profile_picture_url alt="userPhoto" width="100">
   </div>
   <div class="count">
-    <div class="num">121</div>
+    <div class="num">{{basicInfo.media_count}}</div>
     <div class="unit">貼文</div>
   </div>
   <div class="count">
-    <div class="num">213</div>
+    <div class="num">{{basicInfo.followers_count}}</div>
     <div class="unit">粉絲</div>
   </div>
   <div class="count">
-    <div class="num">246</div>
+    <div class="num">{{basicInfo.follows_count}}</div>
     <div class="unit">追蹤中</div>
   </div>
 </div>
 <div id="intro">
-  <h4>大橘偷懶中</h4>
+  <h4>{{basicInfo.name}}</h4>
   <span>演員</span>
-  <p>這是一個測試用帳號</p>
-  <p>About my cat</p>
-  <p>He looks like a dog, but he doesn't!</p>
+  <p>{{basicInfo.biography}}</p>
 </div>
 <div id="picBar">
   <ul class="pics">
@@ -123,18 +121,27 @@ export default {
   data(){
     return{
       toLogIn:false,
-      isChose:true,
-      Chose:false,
+    }
+  },
+  computed:{
+    basicInfo(){
+      return this.$store.state.basicInfo
+    },
+    isChose(){
+      return this.$store.state.isChose
+    },
+    Chose(){
+      return this.$store.state.Chose
     }
   },
   created(){
-    this.$store.dispatch("fbInit");
+    this.$store.dispatch("initAndShow");
   },
   methods:{
     login() {
       alert("Please log in with account:0983423002 password:letstrythis")
       this.toLogIn = false;
-      this.$store.dispatch("showPage");
+      this.$store.dispatch("loginAndShow");
     },
     logout() {
       this.$store.commit("logout");
@@ -151,13 +158,14 @@ export default {
     },
     goTagged(){
       this.$store.commit('setShowPosts',false);
-      this.isChose = false;
-      this.Chose = true;
+      this.$store.state.isChose = false;
+      this.$store.state.Chose = true;
+      this.$store.dispatch('mentionedList')
     },
     backPosts(){
       this.$store.commit('setShowPosts',true);
-      this.isChose = true;
-      this.Chose = false;
+      this.$store.state.isChose = true;
+      this.$store.state.Chose = false;
     },
     openStory(){
       this.$store.commit('openStory');
