@@ -221,7 +221,7 @@ export default createStore({
         })
       })
     },
-    getStoryID({state,commit}){
+    getStoryID({state}){
       return new Promise((resolve) =>{
         let igUserId = state.igUserId;
         let token = state.profile.accessToken;
