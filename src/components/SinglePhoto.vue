@@ -54,28 +54,24 @@
   {{aPost.caption}}
 </div>
 <div id="comments">
-  <div class="addCom">
-    <input type="text" v-show="addNewCom" v-model="newCom" @keyup.enter="createCom" 
-    @keyup.esc="closeComment" placeholder="回覆留言......" ref="autoFocus">
-  </div>
   <ul class="comList">
     <li v-for="(comment,index) in comments" :key="comment.id">
-      <div
-        class="content"
-        @click="ckeckComInCom(index)"
-        @dblclick="deleteCom(index)"
-      >
+      <div class="delete" @click="deleteCom(index)">X</div>
+      <div class="content">
         {{comment.text}}
-        <div v-if="commentIndex == index">
-          <div class="comInCom"
-            v-for="comInCom in comInComs" :key="comInCom.id"
-          >
-            {{comInCom.text}}
-          </div>
+        <p @click="replyCom()">回覆</p>
+        <div class="comInCom"
+          v-for="comInCom in comInComs" :key="comInCom.id"
+        >
+          {{comInCom.text}}
         </div>
       </div>
     </li>
   </ul>
+  <div class="addCom">
+    <input type="text" v-show="addNewCom" v-model="newCom" @keyup.enter="createCom" 
+    @keyup.esc="closeComment" placeholder="回覆留言......" ref="autoFocus">
+  </div>
 </div>
 </template>
 
@@ -108,9 +104,7 @@ export default {
     closePhoto(){
       this.$store.commit('closePhoto');
     },
-    ckeckComInCom(index){
-      this.$store.state.commentIndex = index;
-      this.$store.dispatch('ckeckComInCom')
+    replyCom(){
       this.addNewCom = true;
       this.$nextTick(()=> {
        this.$refs.autoFocus.focus();
@@ -244,20 +238,41 @@ export default {
   padding-left: 10px;
   list-style-type: none;
 }
+#comments .delete{
+  margin-left: 7px;
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  font-size: 0.6rem;
+  color: black;
+  cursor: pointer;
+}
 #comments li{
+  position: relative;
   display: flex;
   margin-top: 10px;
 }
 #comments .comInCom{
   margin-left: 10px;
+  font-size: 0.6rem;
 }
 #comments .content{
   flex: 1;
   font-size: 0.8rem;
 }
-#comments .delete{
-  margin-left: 7px;
-  color: black;
+#comments .content p{
+  margin: 0;
+  margin-left: 25px;
+  font-size: 0.5rem;
+  color: rgb(138, 138, 138);
   cursor: pointer;
+}
+#comments .addCom{
+  height: 25.4px;
+}
+#comments input{
+  position: fixed;
+  bottom: 0;
+  width: 375px;
 }
 </style>

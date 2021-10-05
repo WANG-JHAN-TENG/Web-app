@@ -17,7 +17,6 @@ export default createStore({
     checkImg:false,
     aPost:{},
     comments:[],
-    commentIndex:"",
     comInComs:[],
     addCom:"",
     deleteId:"",
@@ -98,6 +97,7 @@ export default createStore({
       state.checkImg = false;
       state.aPost = {};
       state.comments = [];
+      state.comInComs = [];
     },
     checkNewStory(state){
       state.checkNewStory = true;
@@ -303,8 +303,7 @@ export default createStore({
     },
     ckeckComInCom({state,commit}){
       return new Promise((resolve) =>{
-        let index = state.commentIndex;
-        let commentID = state.comments[index].id
+        let commentID = state.comments[0].id
         let token = state.profile.accessToken;
         let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?access_token=' + token
         axios.get(url).then((response) =>{
@@ -325,6 +324,15 @@ export default createStore({
           console.log('Add '+ response + ' success!')
           resolve()
         })
+      })
+    },
+    openSinglePhoto({dispatch}){
+      return dispatch('getAPost')
+      .then(() =>{
+        return dispatch('getComments')
+      })
+      .then(() =>{
+        return dispatch('ckeckComInCom')
       })
     },
     refreshCom({dispatch}){

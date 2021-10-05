@@ -41,8 +41,7 @@ export default {
   methods:{
     openPhoto(index){
       this.$store.commit('openPhoto',index);
-      this.$store.dispatch('getAPost');
-      this.$store.dispatch('getComments');
+      this.$store.dispatch('openSinglePhoto');
     }
   }
 }
