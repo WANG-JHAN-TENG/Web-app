@@ -59,7 +59,7 @@
       <div class="delete" @click="deleteCom(index)">X</div>
       <div class="content">
         {{comment.text}}
-        <p @click="replyCom()">回覆</p>
+        <p @click="replyCom(index)">回覆</p>
         <div class="comInCom"
           v-for="comInCom in comInComs" :key="comInCom.id"
         >
@@ -104,7 +104,8 @@ export default {
     closePhoto(){
       this.$store.commit('closePhoto');
     },
-    replyCom(){
+    replyCom(index){
+      this.$store.state.commentIndex = index;
       this.addNewCom = true;
       this.$nextTick(()=> {
        this.$refs.autoFocus.focus();

@@ -17,6 +17,7 @@ export default createStore({
     checkImg:false,
     aPost:{},
     comments:[],
+    commentIndex:"",
     comInComs:[],
     addCom:"",
     deleteId:"",
