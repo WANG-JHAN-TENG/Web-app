@@ -18,6 +18,8 @@ export default createStore({
     aPost:{},
     comments:[],
     commentIndex:"",
+    reply:"",
+    cloneComs:[],
     comInComs:[],
     addCom:"",
     deleteId:"",
@@ -91,8 +93,11 @@ export default createStore({
         state.comments = response.data.mentioned_media.comments.data
       }
     },
-    checkComInCom(state,response){
-      state.comInComs = response.data.data
+    ckeckReply(state,{response,i}){
+      let obj = state.comments[i]
+      let add = {replies : response.data.data}
+      state.comments[i] = Object.assign({},obj,add)
+      console.log(state.comments[i])
     },
     closePhoto(state){
       state.checkImg = false;
@@ -165,8 +170,9 @@ export default createStore({
     },
     getPosts({commit}){
       return new Promise((resolve) =>{
-        axios.get('https://graph.instagram.com/me/media?fields=id,caption,media_url&access_token=IGQVJXVzFfVnE4dGE1dWNoZAWdEakZAOWVZApbHVqY0NmWlQzMWxBWmRsdGtncV9OOGp3Y19ySk43c2twYmVZAS3FCX016N1VLbVF0S05qYk5ha0txc2xiSEVuYnNiN1VENWJQcUw5YkJB')
-        .then((response) =>{
+        let token = "IGQVJXVzFfVnE4dGE1dWNoZAWdEakZAOWVZApbHVqY0NmWlQzMWxBWmRsdGtncV9OOGp3Y19ySk43c2twYmVZAS3FCX016N1VLbVF0S05qYk5ha0txc2xiSEVuYnNiN1VENWJQcUw5YkJB";
+        let url = 'https://graph.instagram.com/me/media?fields=id,caption,media_url&access_token=' + token
+        axios.get(url).then((response) =>{
           console.log(response)
           commit('getPosts',response)
           resolve()
@@ -235,14 +241,19 @@ export default createStore({
     },
     getStory({state,commit},response){
       return new Promise((resolve) =>{
-        let storyId = response.data.data[0].id
-        let token = state.profile.accessToken;
-        let url = 'https://graph.facebook.com/v12.0/' + storyId + '?fields=media_url&access_token=' +token
-        axios.get(url).then((response) =>{
-          console.log(response)
-          commit('getStory',response)
+        if(response.data.data.length > 0){
+          let storyId = response.data.data[0].id
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + storyId + '?fields=media_url&access_token=' +token
+          axios.get(url).then((response) =>{
+            console.log(response)
+            commit('getStory',response)
+            resolve()
+          })
+        }else{
+          console.log('No new story.')
           resolve()
-        })
+        }
       })
     },
     mentionedList({state,commit}){
@@ -302,19 +313,42 @@ export default createStore({
         }
       })
     },
-    ckeckComInCom({state,commit}){
+    ckeckReply({state,commit}){
       return new Promise((resolve) =>{
-        let commentID = state.comments[0].id
+        if(state.showPosts == false){
+          console.log("Can't get reply.")
+          resolve()
+        }else if(state.comments.length > 0){
+          for (let i = 0; i < state.comments.length; i++){
+            let commentID = state.comments[i].id;
+            let token = state.profile.accessToken;
+            let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?access_token=' + token
+            axios.get(url).then((response) =>{
+              // console.log(response)
+              commit('ckeckReply',{response,i})
+            })
+            resolve()
+          }
+        }else{
+          console.log('No new reply.')
+          resolve()
+        }
+      })
+    },
+    addComment({state}){
+      return new Promise((resolve) =>{
+        let id = state.photoId
+        let postID = state.postId[id].id
+        let reply = state.reply
         let token = state.profile.accessToken;
-        let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?access_token=' + token
-        axios.get(url).then((response) =>{
-          console.log(response)
-          commit('checkComInCom',response)
+        let url = 'https://graph.facebook.com/v12.0/' + postID + '/comments?message=' + reply + '&access_token=' + token
+        axios.post(url).then((response) =>{
+          console.log('Add '+ response + ' success!')
           resolve()
         })
       })
     },
-    createCom({state}){
+    addReply({state}){
       return new Promise((resolve) =>{
         let index = state.commentIndex;
         let commentID = state.comments[index].id
@@ -333,13 +367,22 @@ export default createStore({
         return dispatch('getComments')
       })
       .then(() =>{
-        return dispatch('ckeckComInCom')
+        return dispatch('ckeckReply')
+      })
+    },
+    refreshReply({dispatch}){
+      return dispatch('addComment')
+      .then(() =>{
+        return dispatch('getComments')
+      })
+      .then(() =>{
+        return dispatch('ckeckReply')
       })
     },
     refreshCom({dispatch}){
-      return dispatch('createCom')
+      return dispatch('addReply')
       .then(() =>{
-        return dispatch('ckeckComInCom')
+        return dispatch('ckeckReply')
       })
     },
     deleteCom({state}){
@@ -358,6 +401,9 @@ export default createStore({
       return dispatch('deleteCom')
       .then(() =>{
         return dispatch('getComments')
+      })
+      .then(() =>{
+        return dispatch('ckeckReply')
       })
     },
     initAndShow({dispatch}){

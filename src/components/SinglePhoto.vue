@@ -27,7 +27,7 @@
     <img src="../assets/heart.png" alt="like" width="20" height="20">
   </div>
   <div class="comment">
-    <img src="../assets/comment.png" alt="comment" width="20" height="20">
+    <img src="../assets/comment.png" alt="comment" width="20" height="20" @click="openReply">
   </div>
   <div class="share">
     <img src="../assets/share.png" alt="share" width="20" height="20">
@@ -54,17 +54,19 @@
   {{aPost.caption}}
 </div>
 <div id="comments">
+  <div class="replyPost">
+    <input type="text" v-show="addNewReply" v-model="newReply" @keyup.enter="replyPost" 
+    @keyup.esc="closeReply" placeholder="留言......" ref="replyFocus">
+  </div>
   <ul class="comList">
     <li v-for="(comment,index) in comments" :key="comment.id">
       <div class="delete" @click="deleteCom(index)">X</div>
       <div class="content">
         {{comment.text}}
         <p @click="replyCom(index)">回覆</p>
-        <div class="comInCom"
-          v-for="comInCom in comInComs" :key="comInCom.id"
-        >
-          {{comInCom.text}}
-        </div>
+          <div class="comInCom" v-for="n in comment.replies" :key="n.id">
+            {{n.text}}
+          </div>
       </div>
     </li>
   </ul>
@@ -84,6 +86,8 @@ export default {
       return {
         addNewCom:false,
         newCom:"",
+        addNewReply:false,
+        newReply:"",
       };
   },
   computed:{
@@ -104,6 +108,21 @@ export default {
     closePhoto(){
       this.$store.commit('closePhoto');
     },
+    openReply(){
+      this.addNewReply = true;
+      this.$nextTick(()=> {
+       this.$refs.replyFocus.focus();
+      });
+    },
+    closeReply(){
+      this.addNewReply = false;
+    },
+    replyPost(){
+      this.$store.state.reply = this.newReply;
+      this.$store.dispatch('refreshReply')
+      this.newReply = "";
+      this.addNewReply = false;
+    },
     replyCom(index){
       this.$store.state.commentIndex = index;
       this.addNewCom = true;
@@ -115,9 +134,10 @@ export default {
       this.addNewCom = false;
     },
     createCom(){
-      this.$store.state.addCom = this.newCom
+      this.$store.state.addCom = this.newCom;
       this.$store.dispatch('refreshCom')
       this.newCom = "";
+      this.addNewCom = false;
     },
     deleteCom(index){
       this.$store.state.deleteId = index;
@@ -253,6 +273,9 @@ export default {
   display: flex;
   margin-top: 10px;
 }
+#comments .replyPost input{
+  width: 375px;
+}
 #comments .comInCom{
   margin-left: 10px;
   font-size: 0.6rem;
@@ -271,7 +294,7 @@ export default {
 #comments .addCom{
   height: 25.4px;
 }
-#comments input{
+#comments .addCom input{
   position: fixed;
   bottom: 0;
   width: 375px;
