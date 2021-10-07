@@ -56,7 +56,7 @@ export default createStore({
       state.showPosts = status;
     },
     getPosts(state,response){
-      state.posts = response.data.data
+      state.posts.push(response.data);
     },
     getPageId(state,response){
       state.pageId = response.data.data[0].id;
@@ -168,15 +168,26 @@ export default createStore({
         );
       })
     },
-    getPosts({commit}){
+    getPosts({state,commit}){
       return new Promise((resolve) =>{
-        let token = "IGQVJXVzFfVnE4dGE1dWNoZAWdEakZAOWVZApbHVqY0NmWlQzMWxBWmRsdGtncV9OOGp3Y19ySk43c2twYmVZAS3FCX016N1VLbVF0S05qYk5ha0txc2xiSEVuYnNiN1VENWJQcUw5YkJB";
-        let url = 'https://graph.instagram.com/me/media?fields=id,caption,media_url&access_token=' + token
-        axios.get(url).then((response) =>{
-          console.log(response)
-          commit('getPosts',response)
-          resolve()
-        })
+        // let token = "IGQVJXVzFfVnE4dGE1dWNoZAWdEakZAOWVZApbHVqY0NmWlQzMWxBWmRsdGtncV9OOGp3Y19ySk43c2twYmVZAS3FCX016N1VLbVF0S05qYk5ha0txc2xiSEVuYnNiN1VENWJQcUw5YkJB";
+        // let url = 'https://graph.instagram.com/me/media?fields=id,caption,media_url&access_token=' + token
+        // axios.get(url).then((response) =>{
+        //   console.log(response)
+        //   commit('getPosts',response)
+        //   resolve()
+        // })
+        for (let i = 0; i < state.postId.length; i++){
+          let postID = state.postId[i].id
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + postID + 
+          '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+          axios.get(url).then((response) =>{
+            console.log(response)
+            commit('getPosts',response)
+            resolve()
+          })
+        }
       })
     },
     getPageId({state,commit}){
@@ -193,7 +204,6 @@ export default createStore({
     },
     getIGID({state,commit}){
       return new Promise((resolve) => {
-        // let pageID = '104550935308122';
         let pageID = state.pageId ;
         let token = state.profile.accessToken;
         let url = 'https://graph.facebook.com/v12.0/' + pageID + '?fields=instagram_business_account&access_token=' + token
