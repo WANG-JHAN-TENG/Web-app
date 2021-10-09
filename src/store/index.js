@@ -18,10 +18,10 @@ export default createStore({
     aPost:{},
     comments:[],
     commentIndex:"",
-    reply:"",
-    cloneComs:[],
+    hideReplyButton:true,
+    newReply:"",
     comInComs:[],
-    addCom:"",
+    newCom:"",
     deleteId:"",
     checkStory:false,
     checkNewStory:false,
@@ -55,9 +55,6 @@ export default createStore({
     setShowPosts(state,status){
       state.showPosts = status;
     },
-    getPosts(state,response){
-      state.posts.push(response.data);
-    },
     getPageId(state,response){
       state.pageId = response.data.data[0].id;
     },
@@ -70,6 +67,13 @@ export default createStore({
     getPostId(state,response){
       state.postId = response.data.data;
     },
+    getPosts(state,values){
+      // state.posts.push(response.data);
+      // state.posts.sort(function(a, b){
+      //   return a.index - b.index;
+      // });
+      state.posts = values;
+    },
     getStory(state,response){
       state.story = response.data.media_url
     },
@@ -80,8 +84,10 @@ export default createStore({
       state.checkImg = true;
       state.photoId = index;
     },
-    getAPost(state,response){
-      state.aPost = response.data;
+    getAPost(state){
+      // state.aPost = response.data;
+      let id = state.photoId
+      state.aPost = state.posts[id]
     },
     getATaggedPost(state){
       state.aPost = state.mentionedLists[state.photoId]
@@ -89,15 +95,23 @@ export default createStore({
     getComments(state,response){
       if(state.showPosts == true){
         state.comments = response.data.data
+        state.hideReplyButton = true;
       }else{
         state.comments = response.data.mentioned_media.comments.data
+        state.hideReplyButton = false;
       }
     },
     ckeckReply(state,{response,i}){
       let obj = state.comments[i]
       let add = {replies : response.data.data}
       state.comments[i] = Object.assign({},obj,add)
-      console.log(state.comments[i])
+      // console.log(state.comments[i])
+    },
+    checkUsername(state,{response,i}){
+      let obj = state.comments[i]
+      let add = {username : response.data.username}
+      state.comments[i] = Object.assign({},obj,add)
+      // console.log(state.comments[i])
     },
     closePhoto(state){
       state.checkImg = false;
@@ -168,28 +182,6 @@ export default createStore({
         );
       })
     },
-    getPosts({state,commit}){
-      return new Promise((resolve) =>{
-        // let token = "IGQVJXVzFfVnE4dGE1dWNoZAWdEakZAOWVZApbHVqY0NmWlQzMWxBWmRsdGtncV9OOGp3Y19ySk43c2twYmVZAS3FCX016N1VLbVF0S05qYk5ha0txc2xiSEVuYnNiN1VENWJQcUw5YkJB";
-        // let url = 'https://graph.instagram.com/me/media?fields=id,caption,media_url&access_token=' + token
-        // axios.get(url).then((response) =>{
-        //   console.log(response)
-        //   commit('getPosts',response)
-        //   resolve()
-        // })
-        for (let i = 0; i < state.postId.length; i++){
-          let postID = state.postId[i].id
-          let token = state.profile.accessToken;
-          let url = 'https://graph.facebook.com/v12.0/' + postID + 
-          '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
-          axios.get(url).then((response) =>{
-            console.log(response)
-            commit('getPosts',response)
-            resolve()
-          })
-        }
-      })
-    },
     getPageId({state,commit}){
       return new Promise((resolve) => {
         let userID = state.profile.userID;
@@ -238,6 +230,43 @@ export default createStore({
         })
       })
     },
+    getPosts({state,commit}){
+      return new Promise((resolve) =>{
+        // for (let i = 0; i < state.postId.length; i++){
+        //   let postID = state.postId[i].id
+        //   let token = state.profile.accessToken;
+        //   let url = 'https://graph.facebook.com/v12.0/' + postID + 
+        //   '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+        //   axios.get(url).then((response) =>{
+        //     // console.log(response)
+        //     response.data.index = i;
+        //     commit('getPosts',response)
+        //   })
+        // }
+        // console.log(state.posts)
+        let axiosArray = [];
+        let callAxios = function(index){
+            return axios.get(index);
+        } 
+        for (let i = 0; i < state.postId.length; i++){
+          let postID = state.postId[i].id
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + postID + 
+          '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+            let object = callAxios(url);
+            axiosArray.push(object)
+        }
+        axios.all(axiosArray).then(function(values){
+          for(let i = 0; i < values.length; i++){
+            let value = values[i].data;
+            values[i] = Object.assign({},value)
+            commit('getPosts',values)
+            resolve()
+          }
+          console.log(state.posts)
+        })
+      })
+    },
     getStoryID({state}){
       return new Promise((resolve) =>{
         let igUserId = state.igUserId;
@@ -281,16 +310,18 @@ export default createStore({
     getAPost({state,commit}){
       return new Promise((resolve) =>{
         if(state.showPosts == true){
-          let id = state.photoId
-          let postID = state.postId[id].id
-          let token = state.profile.accessToken;
-          let url = 'https://graph.facebook.com/v12.0/' + postID + 
-          '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
-          axios.get(url).then((response) =>{
-            console.log(response)
-            commit('getAPost',response)
-            resolve()
-          })
+          // let id = state.photoId
+          // let postID = state.postId[id].id
+          // let token = state.profile.accessToken;
+          // let url = 'https://graph.facebook.com/v12.0/' + postID + 
+          // '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+          // axios.get(url).then((response) =>{
+          //   console.log(response)
+          //   commit('getAPost',response)
+          //   resolve()
+          // })
+          commit('getAPost')
+          resolve()
         }else{
           commit('getATaggedPost')
           resolve()
@@ -301,7 +332,7 @@ export default createStore({
       return new Promise((resolve) =>{
         if(state.showPosts == true){
           let id = state.photoId
-          let postID = state.postId[id].id
+          let postID = state.posts[id].id
           let token = state.profile.accessToken;
           let url = 'https://graph.facebook.com/v12.0/' + postID + '/comments?access_token=' + token
           axios.get(url).then((response) =>{
@@ -345,26 +376,57 @@ export default createStore({
         }
       })
     },
+    checkUsername({state,commit}){
+      return new Promise((resolve) =>{
+        if(state.showPosts == false){
+          console.log("Can't get username")
+          resolve()
+        }else{
+          for (let i = 0; i < state.comments.length; i++){
+            let commentID = state.comments[i].id;
+            let token = state.profile.accessToken;
+            let url = 'https://graph.facebook.com/v12.0/' + commentID + '?fields=username%2Ctext&access_token=' + token
+            axios.get(url).then((response) =>{
+              console.log(response)
+              commit('checkUsername',{response,i})
+            })
+            resolve()
+          }
+        }
+      })
+    },
     addComment({state}){
       return new Promise((resolve) =>{
-        let id = state.photoId
-        let postID = state.postId[id].id
-        let reply = state.reply
-        let token = state.profile.accessToken;
-        let url = 'https://graph.facebook.com/v12.0/' + postID + '/comments?message=' + reply + '&access_token=' + token
-        axios.post(url).then((response) =>{
-          console.log('Add '+ response + ' success!')
-          resolve()
-        })
+        if(state.showPosts == true){
+          let id = state.photoId
+          let postID = state.postId[id].id
+          let reply = state.newCom
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + postID + '/comments?message=' + reply + '&access_token=' + token
+          axios.post(url).then((response) =>{
+            console.log('Add '+ response + ' success!')
+            resolve()
+          })
+        }else{
+          let id = state.photoId
+          let postID = state.mentionedLists[id].id
+          let newCom = state.newCom
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + postID + '/comments?message=' + newCom + '&access_token=' + token
+          axios.post(url).then((response) =>{
+            console.log('Add '+ response + ' success!')
+            resolve()
+          })
+        }
       })
     },
     addReply({state}){
       return new Promise((resolve) =>{
         let index = state.commentIndex;
         let commentID = state.comments[index].id
-        let addCom = state.addCom
+        let newReply = state.newReply
         let token = state.profile.accessToken;
-        let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?message=' + addCom +'&access_token=' + token
+        let url = 'https://graph.facebook.com/v12.0/' + commentID + '/replies?message=' + newReply +'&access_token=' + token
         axios.post(url).then((response) =>{
           console.log('Add '+ response + ' success!')
           resolve()
@@ -379,8 +441,11 @@ export default createStore({
       .then(() =>{
         return dispatch('ckeckReply')
       })
+      .then(() =>{
+        return dispatch('checkUsername')
+      })
     },
-    refreshReply({dispatch}){
+    refreshCom({dispatch}){
       return dispatch('addComment')
       .then(() =>{
         return dispatch('getComments')
@@ -388,8 +453,11 @@ export default createStore({
       .then(() =>{
         return dispatch('ckeckReply')
       })
+      .then(() =>{
+        return dispatch('checkUsername')
+      })
     },
-    refreshCom({dispatch}){
+    refreshReply({dispatch}){
       return dispatch('addReply')
       .then(() =>{
         return dispatch('ckeckReply')
@@ -414,6 +482,9 @@ export default createStore({
       })
       .then(() =>{
         return dispatch('ckeckReply')
+      })
+      .then(() =>{
+        return dispatch('checkUsername')
       })
     },
     initAndShow({dispatch}){

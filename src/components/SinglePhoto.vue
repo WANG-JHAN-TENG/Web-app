@@ -2,7 +2,7 @@
 <div id="head">
   <div class="undo" @click="closePhoto">&#60;</div>
   <div class="whoPost">
-    ORANGECATXXL
+    {{basicInfo.username}}
     <h4>貼文</h4>
   </div>
 </div>
@@ -11,7 +11,7 @@
     <img src="../assets/userphoto.jpg" alt="userPhoto" width="30">
   </div>
   <div class="user">
-    oragnecatxxl
+    {{basicInfo.username}}
   </div>
   <div class="edit">
     ...
@@ -27,7 +27,7 @@
     <img src="../assets/heart.png" alt="like" width="20" height="20">
   </div>
   <div class="comment">
-    <img src="../assets/comment.png" alt="comment" width="20" height="20" @click="openReply">
+    <img src="../assets/comment.png" alt="comment" width="20" height="20" @click="openComment">
   </div>
   <div class="share">
     <img src="../assets/share.png" alt="share" width="20" height="20">
@@ -54,25 +54,25 @@
   {{aPost.caption}}
 </div>
 <div id="comments">
-  <div class="replyPost">
-    <input type="text" v-show="addNewReply" v-model="newReply" @keyup.enter="replyPost" 
-    @keyup.esc="closeReply" placeholder="留言......" ref="replyFocus">
+  <div class="comment">
+    <input type="text" v-show="addNewCom" v-model="newCom" @keyup.enter="addComment" 
+    @keyup.esc="closeComment" placeholder="留言......" ref="replyFocus">
   </div>
   <ul class="comList">
     <li v-for="(comment,index) in comments" :key="comment.id">
       <div class="delete" @click="deleteCom(index)">X</div>
       <div class="content">
-        {{comment.text}}
-        <p @click="replyCom(index)">回覆</p>
+        <span>{{comment.username}}</span> {{comment.text}}
+        <p @click="openReply(index)" v-show="hideReplyButton">回覆</p>
           <div class="comInCom" v-for="n in comment.replies" :key="n.id">
             {{n.text}}
           </div>
       </div>
     </li>
   </ul>
-  <div class="addCom">
-    <input type="text" v-show="addNewCom" v-model="newCom" @keyup.enter="createCom" 
-    @keyup.esc="closeComment" placeholder="回覆留言......" ref="autoFocus">
+  <div class="replies">
+    <input type="text" v-show="addNewReply" v-model="newReply" @keyup.enter="addReply" 
+    @keyup.esc="closeReply" placeholder="回覆留言......" ref="autoFocus">
   </div>
 </div>
 </template>
@@ -91,6 +91,9 @@ export default {
       };
   },
   computed:{
+    basicInfo(){
+      return this.$store.state.basicInfo
+    },
     aPost(){
       return this.$store.state.aPost;
     },
@@ -103,41 +106,48 @@ export default {
     commentIndex(){
       return this.$store.state.commentIndex;
     },
+    hideReplyButton(){
+      return this.$store.state.hideReplyButton;
+    }
   },
   methods: {
     closePhoto(){
       this.$store.commit('closePhoto');
     },
-    openReply(){
+    openComment(){
+      if(this.$store.state.showPosts == true){
+        this.addNewCom = true;
+        this.$nextTick(()=> {
+        this.$refs.replyFocus.focus();
+        });
+      }else{
+        this.addNewCom = false;
+      }
+    },
+    closeComment(){
+      this.addNewCom = false;
+    },
+    addComment(){
+      this.$store.state.newCom = this.newCom;
+      this.$store.dispatch('refreshCom')
+      this.newCom = "";
+      this.addNewCom = false;
+    },
+    openReply(index){
+      this.$store.state.commentIndex = index;
       this.addNewReply = true;
       this.$nextTick(()=> {
-       this.$refs.replyFocus.focus();
+        this.$refs.autoFocus.focus();
       });
     },
     closeReply(){
       this.addNewReply = false;
     },
-    replyPost(){
-      this.$store.state.reply = this.newReply;
+    addReply(){
+      this.$store.state.newReply = this.newReply;
       this.$store.dispatch('refreshReply')
       this.newReply = "";
       this.addNewReply = false;
-    },
-    replyCom(index){
-      this.$store.state.commentIndex = index;
-      this.addNewCom = true;
-      this.$nextTick(()=> {
-       this.$refs.autoFocus.focus();
-      });
-    },
-    closeComment(){
-      this.addNewCom = false;
-    },
-    createCom(){
-      this.$store.state.addCom = this.newCom;
-      this.$store.dispatch('refreshCom')
-      this.newCom = "";
-      this.addNewCom = false;
     },
     deleteCom(index){
       this.$store.state.deleteId = index;
@@ -170,6 +180,7 @@ export default {
   text-align: center;
   padding-right: 100px;
   padding-top: 5px;
+  text-transform: uppercase;
   font-size: 0.7rem;
   font-weight: 400;
   color: grey;
@@ -273,7 +284,7 @@ export default {
   display: flex;
   margin-top: 10px;
 }
-#comments .replyPost input{
+#comments .comment input{
   width: 375px;
 }
 #comments .comInCom{
@@ -284,6 +295,10 @@ export default {
   flex: 1;
   font-size: 0.8rem;
 }
+#comments .content span{
+  font-weight: 800;
+  margin-right: 5px;
+}
 #comments .content p{
   margin: 0;
   margin-left: 25px;
@@ -291,10 +306,10 @@ export default {
   color: rgb(138, 138, 138);
   cursor: pointer;
 }
-#comments .addCom{
+#comments .replies{
   height: 25.4px;
 }
-#comments .addCom input{
+#comments .replies input{
   position: fixed;
   bottom: 0;
   width: 375px;
