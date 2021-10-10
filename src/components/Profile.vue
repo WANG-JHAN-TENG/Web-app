@@ -31,7 +31,7 @@
   <span>演員</span>
   <p>{{basicInfo.biography}}</p>
 </div>
-<div id="picBar">
+<div id="picBar" v-show="loginAndShow">
   <ul class="pics">
     <li class="pic">
       <div class="lifePic" @click="openStory">
@@ -132,6 +132,9 @@ export default {
     },
     Chose(){
       return this.$store.state.Chose
+    },
+    loginAndShow(){
+      return this.$store.state.loginAndShow
     }
   },
   created(){

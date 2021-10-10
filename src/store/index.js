@@ -1,9 +1,11 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
+// import { reject } from 'core-js/fn/promise';
 
 export default createStore({
   state: {
     profile:{},
+    loginAndShow:false,
     posts:[],
     pageId:"",
     igUserId:"",
@@ -31,12 +33,13 @@ export default createStore({
     login(state,response,res){
       if(response){
         state.profile = response.authResponse;
+        state.loginAndShow = true;
       }else{
         state.profile = res.authResponse;
+        state.loginAndShow = true;
       }
     },
-    logout(){
-      const vm = this;
+    logout(state){
       window.FB.getLoginStatus(function(response) {
         if (response.status === "connected") {
           window.FB.api("/me/permissions", "DELETE", function(res) {
@@ -44,13 +47,16 @@ export default createStore({
             console.log(res)
           });
         } else {
-          // do something
+          console.log("Already log out")
         }
       });
-      vm.state.profile = {};
-      vm.state.basicInfo = {};
-      vm.state.posts = [];
-      vm.state.mentionedLists = [];
+      state.profile = {};
+      state.loginAndShow = false;
+      state.pageId = "";
+      state.igUserId = "";
+      state.basicInfo = {};
+      state.posts = [];
+      state.mentionedLists = [];
     },
     setShowPosts(state,status){
       state.showPosts = status;
@@ -297,14 +303,19 @@ export default createStore({
     },
     mentionedList({state,commit}){
       return new Promise((resolve) =>{
-        let igUserId = state.igUserId
-        let token = state.profile.accessToken;
-        let url = 'https://graph.facebook.com/v12.0/' + igUserId + '/tags?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
-        axios.get(url).then((response) =>{
-          console.log(response)
-          commit('mentionedList',response)
+        if(state.igUserId.length > 0){
+          let igUserId = state.igUserId
+          let token = state.profile.accessToken;
+          let url = 'https://graph.facebook.com/v12.0/' + igUserId + '/tags?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
+          axios.get(url).then((response) =>{
+            console.log(response)
+            commit('mentionedList',response)
+            resolve()
+          })
+        }else{
+          console.log('Please log in!')
           resolve()
-        })
+        }
       })
     },
     getAPost({state,commit}){
@@ -329,7 +340,7 @@ export default createStore({
       })
     },
     getComments({state,commit}){
-      return new Promise((resolve) =>{
+      return new Promise((resolve,reject) =>{
         if(state.showPosts == true){
           let id = state.photoId
           let postID = state.posts[id].id
@@ -350,6 +361,9 @@ export default createStore({
             console.log(response)
             commit('getComments',response)
             resolve()
+          })
+          .catch(() =>{
+            reject('No comment')
           })
         }
       })

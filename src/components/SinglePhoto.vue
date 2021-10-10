@@ -60,7 +60,7 @@
   </div>
   <ul class="comList">
     <li v-for="(comment,index) in comments" :key="comment.id">
-      <div class="delete" @click="deleteCom(index)">X</div>
+      <div class="delete" v-show="hideReplyButton" @click="deleteCom(index)">X</div>
       <div class="content">
         <span>{{comment.username}}</span> {{comment.text}}
         <p @click="openReply(index)" v-show="hideReplyButton">回覆</p>
