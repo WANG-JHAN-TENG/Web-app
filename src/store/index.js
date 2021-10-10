@@ -74,10 +74,6 @@ export default createStore({
       state.postId = response.data.data;
     },
     getPosts(state,values){
-      // state.posts.push(response.data);
-      // state.posts.sort(function(a, b){
-      //   return a.index - b.index;
-      // });
       state.posts = values;
     },
     getStory(state,response){
@@ -238,18 +234,6 @@ export default createStore({
     },
     getPosts({state,commit}){
       return new Promise((resolve) =>{
-        // for (let i = 0; i < state.postId.length; i++){
-        //   let postID = state.postId[i].id
-        //   let token = state.profile.accessToken;
-        //   let url = 'https://graph.facebook.com/v12.0/' + postID + 
-        //   '?fields=caption%2Clike_count%2Cmedia_product_type%2Cmedia_url&access_token=' + token
-        //   axios.get(url).then((response) =>{
-        //     // console.log(response)
-        //     response.data.index = i;
-        //     commit('getPosts',response)
-        //   })
-        // }
-        // console.log(state.posts)
         let axiosArray = [];
         let callAxios = function(index){
             return axios.get(index);
@@ -266,9 +250,9 @@ export default createStore({
           for(let i = 0; i < values.length; i++){
             let value = values[i].data;
             values[i] = Object.assign({},value)
-            commit('getPosts',values)
-            resolve()
           }
+          commit('getPosts',values)
+          resolve()
           console.log(state.posts)
         })
       })
