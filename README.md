@@ -1,6 +1,6 @@
 # webapp：https://wang-jhan-teng.github.io/web-app/
 
-## `點擊右上角選單登入並開始使用(Please click the button in top-right corner of page to start)`
+## `點擊右上角選單登入並開始使用(Please click the button in the top-right corner of page to start)`
 
 ## 
 ```
