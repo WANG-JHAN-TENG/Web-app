@@ -15,7 +15,6 @@ IG API, vue, vuex, axios, SDK, JavaScript
 ```
 
 ###
-```
 登入流程(為避免與個人帳號衝突，建議可以直接改用無痕視窗開啟唷)
 
 1、點擊右上選單登入
@@ -32,5 +31,4 @@ IG API, vue, vuex, axios, SDK, JavaScript
 
 5、全部授權
 ![image](https://user-images.githubusercontent.com/85831251/141080657-5d56a02e-2e7d-4b7a-b715-c2c6496e9835.png)
-```
-###
+
