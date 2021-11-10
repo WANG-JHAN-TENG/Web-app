@@ -27,11 +27,14 @@ IG API, vue, vuex, axios, SDK, JavaScript
 ![image](https://user-images.githubusercontent.com/85831251/141080269-39b6bd95-409b-406d-ab39-97258846f421.png)
 
 3、選取商業帳號
+
 ![image](https://user-images.githubusercontent.com/85831251/141080467-df52d33d-bd2a-4bb5-84f6-db011db15faa.png)
 
 4、選取與商業帳號連結的粉絲專頁
+
 ![image](https://user-images.githubusercontent.com/85831251/141080569-7731e4cc-1e58-4f91-bfe7-5bce35f6e776.png)
 
 5、全部授權
+
 ![image](https://user-images.githubusercontent.com/85831251/141080657-5d56a02e-2e7d-4b7a-b715-c2c6496e9835.png)
 
